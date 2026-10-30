@@ -1,7 +1,10 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from analysis import create_analysis, list_analyses
@@ -26,6 +29,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+static_dir = Path(__file__).parent / "frontend" / "dist"
+if static_dir.is_dir():
+    app.mount("/assets", StaticFiles(directory=static_dir / "assets"), name="assets")
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -52,3 +59,11 @@ def create_analysis_endpoint(
 @app.get("/analyses", response_model=list[AnalysisResponse])
 def get_analyses(db: Session = Depends(get_db)) -> list[Analysis]:
     return list_analyses(db)
+
+
+@app.get("/{path:path}", include_in_schema=False)
+def frontend(path: str) -> FileResponse:
+    requested_file = static_dir / path
+    if path and requested_file.is_file():
+        return FileResponse(requested_file)
+    return FileResponse(static_dir / "index.html")

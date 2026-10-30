@@ -1,0 +1,13 @@
+:root { font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+body { margin: 0; }
+main { max-width: 760px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+header { display: flex; justify-content: space-between; gap: 1rem; color: #526078; }
+h1 { margin-top: 3rem; font-size: clamp(2rem, 6vw, 4rem); line-height: 1.05; }
+form, section { margin-top: 2rem; padding: 1.25rem; background: white; border: 1px solid #dfe5ef; border-radius: 12px; }
+label, textarea, button { display: block; width: 100%; box-sizing: border-box; }
+label { font-weight: 700; margin-bottom: .6rem; }
+textarea { padding: .8rem; border: 1px solid #b9c3d4; border-radius: 8px; resize: vertical; font: inherit; }
+button { margin-top: .8rem; padding: .75rem 1rem; border: 0; border-radius: 8px; background: #3157d5; color: white; font: inherit; cursor: pointer; }
+button:disabled { opacity: .6; cursor: not-allowed; }
+section button { text-align: left; background: #eef2ff; color: #172033; }
+li { margin: .6rem 0; }
