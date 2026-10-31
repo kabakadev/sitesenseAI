@@ -18,7 +18,7 @@ Add a free Google AI Studio key to `.env`:
 
 ```env
 GEMINI_API_KEY=your-key-here
-GEMMA_MODEL=gemma-3-27b-it
+GEMMA_MODEL=gemma-4-26b-a4b-it
 ```
 
 Start the API:

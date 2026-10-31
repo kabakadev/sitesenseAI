@@ -224,7 +224,7 @@ the React client.
 The configured model is controlled by:
 
 ```env
-GEMMA_MODEL=gemma-3-27b-it
+GEMMA_MODEL=gemma-4-26b-a4b-it
 ```
 
 The exact model identifier must be confirmed against the models available to

@@ -16,13 +16,26 @@ class GemmaRequestError(RuntimeError):
     pass
 
 
+def extract_text(response_data: dict) -> str:
+    parts = response_data["candidates"][0]["content"]["parts"]
+    answer = [part["text"] for part in parts if not part.get("thought") and "text" in part]
+    if not answer:
+        raise KeyError("no answer part in response")
+    text = "".join(answer).strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text.startswith("json"):
+            text = text[4:]
+    return text.strip()
+
+
 def suggest_tasks(project_name: str, description: str, current_tasks: list[str]) -> list[dict]:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise GemmaConfigurationError(
             "GEMINI_API_KEY is not configured. Add a Google AI Studio key to backend/.env."
         )
-    model = os.getenv("GEMMA_MODEL", "gemma-3-27b-it")
+    model = os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it")
     prompt = (
         "You are a project planning assistant. Return only valid JSON with a "
         'single "suggestions" array. Each item must have "title", "description", '
@@ -48,7 +61,7 @@ def suggest_tasks(project_name: str, description: str, current_tasks: list[str])
     except (HTTPError, URLError, TimeoutError) as error:
         raise GemmaRequestError(f"Gemma request failed: {error}") from error
     try:
-        response_text = response_data["candidates"][0]["content"]["parts"][0]["text"]
+        response_text = extract_text(response_data)
         suggestions = json.loads(response_text)["suggestions"]
         if not isinstance(suggestions, list):
             raise TypeError
@@ -71,7 +84,7 @@ def analyze_with_gemma(input_text: str) -> tuple[str, str]:
             "GEMINI_API_KEY is not configured. Add a Google AI Studio key to backend/.env."
         )
 
-    model = os.getenv("GEMMA_MODEL", "gemma-3-27b-it")
+    model = os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it")
     prompt = (
         "Analyze the following submission for SiteSense. Return only valid JSON "
         'with exactly two string arrays: "findings" and "recommendations". '
@@ -96,7 +109,7 @@ def analyze_with_gemma(input_text: str) -> tuple[str, str]:
         raise GemmaRequestError(f"Gemma request failed: {error}") from error
 
     try:
-        response_text = response_data["candidates"][0]["content"]["parts"][0]["text"]
+        response_text = extract_text(response_data)
         result = json.loads(response_text)
         findings = result["findings"]
         recommendations = result["recommendations"]
