@@ -1,8 +1,8 @@
-# SiteSense MVP
+# SiteSense Project Tracker
 
-SiteSense is a minimal full-stack demo using React, FastAPI, SQLite, and Gemma
-through the Google AI Studio Gemini API. The backend serves the built frontend,
-so the complete application deploys as one web service.
+SiteSense is a minimal construction project-tracking application with a
+Gemma-powered planning assistant. The React frontend and FastAPI backend are
+served together by one Docker web service.
 
 ## Local setup
 
@@ -14,57 +14,71 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Add a free key from [Google AI Studio](https://aistudio.google.com/apikey) to
-`.env`:
+Add a free Google AI Studio key to `.env`:
 
 ```env
 GEMINI_API_KEY=your-key-here
 GEMMA_MODEL=gemma-3-27b-it
 ```
 
-Run the API:
+Start the API:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-For frontend development, use a second terminal:
+Open `http://localhost:8000`. SQLite is used by default, so PostgreSQL is not
+required for the MVP.
 
-```bash
-cd backend/frontend
-npm install
-npm run dev
+## MVP workflow
+
+- Create a construction project.
+- Add tasks to the project.
+- Move tasks between Todo, In Progress, and Done.
+- See completion calculated from completed tasks.
+- Ask Gemma for practical task suggestions and add suggestions selectively.
+
+API routes:
+
+```text
+GET   /health
+GET   /api/v1/projects
+POST  /api/v1/projects
+GET   /api/v1/projects/{id}
+PATCH /api/v1/projects/{id}
+GET   /api/v1/projects/{id}/tasks
+POST  /api/v1/projects/{id}/tasks
+PATCH /api/v1/tasks/{id}
+POST  /api/v1/projects/{id}/suggest-tasks
 ```
-
-The default database is a local `sitesense.db` SQLite file. The API supports:
-
-- `GET /health`
-- `POST /analyses`
-- `GET /analyses`
 
 ## Render deployment
 
-Create a **Web Service** from the `kabakadev/sitesenseAI` repository:
+Create a **Web Service** from
+<https://github.com/kabakadev/sitesenseAI>.
 
 | Setting | Value |
 |---|---|
-| Environment | Docker |
+| Runtime | Docker |
 | Branch | `main` |
-| Dockerfile path | `./Dockerfile` |
+| Dockerfile | `./Dockerfile` |
 | Instance type | Free |
 | Health check path | `/health` |
 
-Add these environment variables in Render:
+Add these encrypted environment variables in Render:
 
 ```text
-GEMINI_API_KEY=<paste your Google AI Studio key in Render>
+GEMINI_API_KEY=<Google AI Studio key>
 GEMMA_MODEL=gemma-3-27b-it
 ```
 
-Render supplies `PORT` automatically. The Docker image uses it and defaults to
-`8000` locally. The deployed service serves both the React frontend and API
-from the same URL.
+Render supplies `PORT`; the Docker command uses it automatically. The free
+filesystem is ephemeral, so SQLite project data can disappear after a restart
+or redeploy. That limitation is acceptable for this demonstration MVP.
 
-The free Render filesystem is ephemeral, so SQLite history can disappear when
-the service restarts or redeploys. This is acceptable for the MVP demo. Do not
-commit `.env` or API keys.
+## Scope note
+
+The interface is based on the contributor construction-intelligence frontend,
+but the implemented scope is intentionally limited to projects, tasks,
+progress, and Gemma task suggestions. Authentication, team collaboration,
+finance, materials, uploads, and computer vision remain future work.

@@ -270,6 +270,11 @@ Implement the pivot in this order:
 10. Build and manually verify the complete create-project-to-complete-task
     flow.
 
+The first implementation of this corrected slice now provides the project and
+task routes, computed progress, and the Gemma task-suggestion endpoint. The
+remaining future work is the broader construction operations surface, not the
+core tracker happy path.
+
 Do not spend the remaining project time on a full authentication system,
 database migration framework, or multi-user permissions unless the core tracker
 flow is already working.
